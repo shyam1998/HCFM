@@ -10,7 +10,6 @@ pip install -r requirements.txt
 
 ```text
 src/        benchmark code and HCFM implementation
-scripts/    PowerShell launch helpers
 data/       place datasets here
 outputs/    generated results
 ```
@@ -36,12 +35,6 @@ data/
 Univariate UCR example:
 
 ```powershell
-.\scripts\run_ucr_full_example.ps1
-```
-
-Equivalent direct command:
-
-```powershell
 python src\run_univariate_ucr.py `
   --datasets UCR_1,UCR_16,UCR_21,UCR_45,UCR_120 `
   --seeds 42 `
@@ -54,7 +47,7 @@ python src\run_univariate_ucr.py `
 Multivariate audit / summary:
 
 ```powershell
-.\scripts\run_multivariate_audit.ps1
+python src\run_multivariate.py
 ```
 
 ## Outputs
@@ -70,4 +63,3 @@ Multivariate summaries:
 ```text
 outputs/multivariate/
 ```
-
