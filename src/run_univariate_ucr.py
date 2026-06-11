@@ -36,14 +36,22 @@ def discover_ucr_datasets(data_root: Path) -> list[str]:
     if not data_root.exists():
         raise FileNotFoundError(f"UCR data root not found: {data_root}")
     dataset_ids = []
-    for path in sorted(data_root.glob("UCR_*.txt")):
+    for path in sorted(data_root.rglob("UCR_*.txt")):
         stem = path.stem
         parts = stem.split("_")
         if len(parts) >= 2 and parts[0] == "UCR" and parts[1].isdigit():
             dataset_ids.append(f"UCR_{int(parts[1])}")
+    for path in sorted(data_root.rglob("UCR_*_train.npy")):
+        stem = path.name.replace("_train.npy", "")
+        parts = stem.split("_")
+        if len(parts) >= 2 and parts[0] == "UCR" and parts[1].isdigit():
+            test_path = path.with_name(f"{stem}_test.npy")
+            label_path = path.with_name(f"{stem}_test_label.npy")
+            if test_path.exists() and label_path.exists():
+                dataset_ids.append(f"UCR_{int(parts[1])}")
     dataset_ids = sorted(set(dataset_ids), key=lambda name: int(name.split("_")[1]))
     if not dataset_ids:
-        raise FileNotFoundError(f"No UCR_*.txt files found under: {data_root}")
+        raise FileNotFoundError(f"No UCR datasets found under: {data_root} or its subdirectories")
     return dataset_ids
 
 

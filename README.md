@@ -19,7 +19,9 @@ Expected data layout:
 ```text
 data/
   UCR/
-    UCR_*.txt
+    UCR_*_train.npy
+    UCR_*_test.npy
+    UCR_*_test_label.npy
   multivariate/
     MSL/
     SMAP/
@@ -29,6 +31,9 @@ data/
     NIPS_TS_Swan/
     NIPS_TS_Creditcard/
 ```
+
+Datasets are available here:
+https://drive.google.com/drive/folders/1RaIJQ8esoWuhyphhmMaH-VCDh-WIluRR?usp=sharing
 
 ## Run
 
@@ -41,7 +46,7 @@ python src\run_univariate_ucr.py `
   --methods "Vanilla Data FM,Data FDM-lite,Data HCFM"
 ```
 
-The univariate script runs all `UCR_*.txt` datasets found under `data/UCR`.
+The univariate script runs all UCR datasets found under `data/UCR`.
 
 Multivariate benchmark:
 
