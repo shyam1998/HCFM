@@ -1,9 +1,4 @@
 #!/usr/bin/env python3
-"""Self-contained multivariate HCFM benchmark runner.
-
-This file is generated from the active code path in ``hcfm_multivariate.ipynb``
-and vendored for reviewer execution inside the code submission folder.
-"""
 
 from __future__ import annotations
 
