@@ -52,7 +52,7 @@ Multivariate benchmark:
 
 ```powershell
 python src\run_multivariate.py `
-  --seed 123 `
+  --seeds 123 `
   --train_steps 15000
 ```
 

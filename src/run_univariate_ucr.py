@@ -74,6 +74,7 @@ def run_one(dataset_id: str, seed: int, args: argparse.Namespace, output_root: P
         strict_v1_config=False,
         run_label="code_submission_univariate",
         hcfm_variant="code_submission",
+        hcfm_lambda_ortho=10.0,
         hcfm_use_physics_residual_loss=False,
         hcfm_lambda_physics_residual=0.0,
     )

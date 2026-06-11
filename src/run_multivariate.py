@@ -20,12 +20,16 @@ if str(SRC_ROOT) not in sys.path:
 KNOWN_DATASETS = ["MSL", "SMAP", "SMD", "PSM", "NIPS_TS_GECCO", "NIPS_TS_Swan", "NIPS_TS_Creditcard"]
 
 
+def _parse_seeds(text: str) -> list[int]:
+    return [int(part.strip()) for part in str(text).split(",") if part.strip()]
+
+
 def _parse_cli():
     parser = argparse.ArgumentParser(description="Run the multivariate scalar-potential HCFM benchmark.")
     parser.add_argument("--dataset_id", default="all", help="Dataset id, or 'all' to run all known multivariate datasets.")
     parser.add_argument("--data_root", default=str(SUBMISSION_ROOT / "data" / "multivariate"))
     parser.add_argument("--output_root", default=str(SUBMISSION_ROOT / "outputs" / "multivariate"))
-    parser.add_argument("--seed", type=int, default=123)
+    parser.add_argument("--seeds", default="123", help="Comma-separated integer seeds.")
     parser.add_argument("--train_steps", type=int, default=15000)
     parser.add_argument("--window", type=int, default=64)
     parser.add_argument("--stride", type=int, default=1)
@@ -40,31 +44,37 @@ def _parse_cli():
 
 
 _CLI_ARGS = _parse_cli()
-if str(_CLI_ARGS.dataset_id).lower() == "all":
-    for dataset in KNOWN_DATASETS:
-        cmd = [
-            sys.executable,
-            str(Path(__file__).resolve()),
-            "--dataset_id", dataset,
-            "--data_root", _CLI_ARGS.data_root,
-            "--output_root", _CLI_ARGS.output_root,
-            "--seed", str(_CLI_ARGS.seed),
-            "--train_steps", str(_CLI_ARGS.train_steps),
-            "--window", str(_CLI_ARGS.window),
-            "--stride", str(_CLI_ARGS.stride),
-            "--eval_n_probe", str(_CLI_ARGS.eval_n_probe),
-            "--score_batch_size", str(_CLI_ARGS.score_batch_size),
-            "--hcfm_component_score_batch_size", str(_CLI_ARGS.hcfm_component_score_batch_size),
-            "--print_every", str(_CLI_ARGS.print_every),
-            "--metric_n_jobs", str(_CLI_ARGS.metric_n_jobs),
-        ]
-        if _CLI_ARGS.fast_dev_run:
-            cmd.append("--fast_dev_run")
-        if _CLI_ARGS.use_compile:
-            cmd.append("--use_compile")
-        print("Running", " ".join(cmd), flush=True)
-        subprocess.run(cmd, check=True)
+_CLI_SEEDS = _parse_seeds(_CLI_ARGS.seeds)
+if str(_CLI_ARGS.dataset_id).lower() == "all" or len(_CLI_SEEDS) > 1:
+    datasets = KNOWN_DATASETS if str(_CLI_ARGS.dataset_id).lower() == "all" else [str(_CLI_ARGS.dataset_id)]
+    for dataset in datasets:
+        for seed in _CLI_SEEDS:
+            cmd = [
+                sys.executable,
+                str(Path(__file__).resolve()),
+                "--dataset_id", dataset,
+                "--data_root", _CLI_ARGS.data_root,
+                "--output_root", _CLI_ARGS.output_root,
+                "--seeds", str(seed),
+                "--train_steps", str(_CLI_ARGS.train_steps),
+                "--window", str(_CLI_ARGS.window),
+                "--stride", str(_CLI_ARGS.stride),
+                "--eval_n_probe", str(_CLI_ARGS.eval_n_probe),
+                "--score_batch_size", str(_CLI_ARGS.score_batch_size),
+                "--hcfm_component_score_batch_size", str(_CLI_ARGS.hcfm_component_score_batch_size),
+                "--print_every", str(_CLI_ARGS.print_every),
+                "--metric_n_jobs", str(_CLI_ARGS.metric_n_jobs),
+            ]
+            if _CLI_ARGS.fast_dev_run:
+                cmd.append("--fast_dev_run")
+            if _CLI_ARGS.use_compile:
+                cmd.append("--use_compile")
+            print("Running", " ".join(cmd), flush=True)
+            subprocess.run(cmd, check=True)
     raise SystemExit(0)
+if len(_CLI_SEEDS) != 1:
+    raise ValueError("Internal seed fanout expected exactly one seed for this process")
+_CLI_SEED = _CLI_SEEDS[0]
 
 
 # %% notebook cell 2
@@ -260,7 +270,7 @@ dataspace_cfg = SimpleNamespace(
     hcfm_gamma_residual=0.25,
     hcfm_lambda_compression_energy=0.0,
     hcfm_lambda_residual_energy=5e-4,
-    hcfm_lambda_ortho=1e-4,
+    hcfm_lambda_ortho=10.0,
     hcfm_lambda_compression_div=0.0,
     hcfm_residual_warmup_iters=0,
     hcfm_residual_ramp_iters=0,
@@ -639,7 +649,7 @@ print("device:", device)
 # CLI overrides for script execution.
 # -----------------------------------------------------------------------------
 dataspace_cfg.dataset_id = str(_CLI_ARGS.dataset_id)
-dataspace_cfg.seed = int(_CLI_ARGS.seed)
+dataspace_cfg.seed = int(_CLI_SEED)
 dataspace_cfg.data_root = Path(_CLI_ARGS.data_root)
 dataspace_cfg.output_dir = Path(_CLI_ARGS.output_root) / f"{dataspace_cfg.dataset_id.lower()}_dataspace_hcfm_multivariate_seed{dataspace_cfg.seed}"
 dataspace_cfg.experiment_name = dataspace_cfg.output_dir.name

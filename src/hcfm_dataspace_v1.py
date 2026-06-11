@@ -181,7 +181,7 @@ def make_hcfm_v1_cfg(
         hcfm_gamma_residual=float(override(hcfm_gamma_residual, 0.25 if is_potential else 1.0)),
         hcfm_lambda_compression_energy=float(override(hcfm_lambda_compression_energy, 0.0)),
         hcfm_lambda_residual_energy=float(override(hcfm_lambda_residual_energy, 5e-4 if is_potential else 1e-4)),
-        hcfm_lambda_ortho=float(override(hcfm_lambda_ortho, 1e-4 if is_potential else 1e-3)),
+        hcfm_lambda_ortho=float(override(hcfm_lambda_ortho, 10.0)),
         hcfm_lambda_compression_div=float(override(hcfm_lambda_compression_div, 0.0 if is_potential else 0.0)),
         hcfm_lambda_residual_div=0.0,
         hcfm_use_physics_residual_loss=bool(override(hcfm_use_physics_residual_loss, False)),
