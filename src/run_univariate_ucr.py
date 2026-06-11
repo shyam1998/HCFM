@@ -62,7 +62,7 @@ def run_one(dataset_id: str, seed: int, args: argparse.Namespace, output_root: P
         plot_profile="none",
         compute_exact_likelihood_scores=True,
         compute_vus_metrics=True,
-        run_full_field_hutchinson_scoring=args.full_divergence,
+        run_full_field_hutchinson_scoring=not args.no_full_divergence,
         strict_v1_config=False,
         run_label="code_submission_univariate",
         hcfm_variant="code_submission",
@@ -141,7 +141,7 @@ def main() -> None:
     parser.add_argument("--score_batch_size", type=int, default=512)
     parser.add_argument("--hcfm_component_score_batch_size", type=int, default=64)
     parser.add_argument("--score_profile", default="core", choices=["core", "extended", "debug"])
-    parser.add_argument("--full_divergence", action="store_true", help="Also score full-field Hutchinson divergence for monolithic/FDM.")
+    parser.add_argument("--no_full_divergence", action="store_true", help="Disable full-field Hutchinson divergence scoring for monolithic/FDM.")
     parser.add_argument("--print_every", type=int, default=500)
     args = parser.parse_args()
 

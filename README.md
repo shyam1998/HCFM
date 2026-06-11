@@ -38,9 +38,7 @@ Univariate UCR example:
 python src\run_univariate_ucr.py `
   --seeds 42 `
   --train_steps 15000 `
-  --methods "Vanilla Data FM,Data FDM-lite,Data HCFM" `
-  --score_profile core `
-  --full_divergence
+  --methods "Vanilla Data FM,Data FDM-lite,Data HCFM"
 ```
 
 The univariate script runs all `UCR_*.txt` datasets found under `data/UCR`.
