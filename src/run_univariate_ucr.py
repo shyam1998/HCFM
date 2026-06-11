@@ -1,10 +1,4 @@
 #!/usr/bin/env python3
-"""Minimal univariate HCFM benchmark entry point for reviewers.
-
-This script runs the scalar-potential HCFM data-space benchmark on all UCR
-datasets found under ``data/UCR`` and writes the same CSV artifacts used in the
-paper experiments.
-"""
 
 from __future__ import annotations
 
