@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 """Minimal univariate HCFM benchmark entry point for reviewers.
 
-This script runs the scalar-potential HCFM data-space benchmark on one or more
-UCR datasets and writes the same CSV artifacts used in the paper experiments.
-It is intentionally small: the model/training/metric code lives in
-``hcfm_dataspace_v1.py`` at the repository root.
+This script runs the scalar-potential HCFM data-space benchmark on all UCR
+datasets found under ``data/UCR`` and writes the same CSV artifacts used in the
+paper experiments.
 """
 
 from __future__ import annotations
@@ -26,12 +25,26 @@ if str(SRC) not in sys.path:
 from hcfm_dataspace_v1 import make_hcfm_v1_cfg, run_single_dataset_seed, select_key_scores  # noqa: E402
 
 
-DEFAULT_DATASETS = ["UCR_1"]
 DEFAULT_METHODS = ["Vanilla Data FM", "Data HCFM"]
 
 
 def parse_csv(text: str) -> list[str]:
     return [part.strip() for part in text.split(",") if part.strip()]
+
+
+def discover_ucr_datasets(data_root: Path) -> list[str]:
+    if not data_root.exists():
+        raise FileNotFoundError(f"UCR data root not found: {data_root}")
+    dataset_ids = []
+    for path in sorted(data_root.glob("UCR_*.txt")):
+        stem = path.stem
+        parts = stem.split("_")
+        if len(parts) >= 2 and parts[0] == "UCR" and parts[1].isdigit():
+            dataset_ids.append(f"UCR_{int(parts[1])}")
+    dataset_ids = sorted(set(dataset_ids), key=lambda name: int(name.split("_")[1]))
+    if not dataset_ids:
+        raise FileNotFoundError(f"No UCR_*.txt files found under: {data_root}")
+    return dataset_ids
 
 
 def run_one(dataset_id: str, seed: int, args: argparse.Namespace, output_root: Path) -> Path:
@@ -114,7 +127,6 @@ def consolidate(run_dirs: list[Path], output_root: Path) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Run a minimal univariate HCFM benchmark.")
-    parser.add_argument("--datasets", default=",".join(DEFAULT_DATASETS), help="Comma-separated UCR ids.")
     parser.add_argument("--seeds", default="42", help="Comma-separated integer seeds.")
     parser.add_argument("--data_root", default=str(ROOT / "data" / "UCR"))
     parser.add_argument("--output_root", default=str(ROOT / "outputs" / "univariate"))
@@ -139,7 +151,9 @@ def main() -> None:
     (output_root / "command_config.json").write_text(json.dumps(vars(args), indent=2), encoding="utf-8")
 
     run_dirs = []
-    for dataset_id in parse_csv(args.datasets):
+    dataset_ids = discover_ucr_datasets(Path(args.data_root))
+    pd.DataFrame({"dataset_id": dataset_ids}).to_csv(output_root / "discovered_datasets.csv", index=False)
+    for dataset_id in dataset_ids:
         for seed_text in parse_csv(args.seeds):
             run_dirs.append(run_one(dataset_id, int(seed_text), args, output_root))
 
