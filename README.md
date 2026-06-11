@@ -41,8 +41,6 @@ python src\run_univariate_ucr.py `
   --methods "Vanilla Data FM,Data FDM-lite,Data HCFM"
 ```
 
-The univariate script runs all `UCR_*.txt` datasets found under `data/UCR`.
-
 Multivariate audit / summary:
 
 ```powershell
