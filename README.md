@@ -41,11 +41,18 @@ python src\run_univariate_ucr.py `
   --methods "Vanilla Data FM,Data FDM-lite,Data HCFM"
 ```
 
-Multivariate audit / summary:
+The univariate script runs all `UCR_*.txt` datasets found under `data/UCR`.
+
+Multivariate benchmark:
 
 ```powershell
-python src\run_multivariate.py
+python src\run_multivariate.py `
+  --seed 123 `
+  --train_steps 15000
 ```
+
+The multivariate script runs all known datasets found under `data/multivariate`
+by default. Use `--dataset_id MSL` to run one dataset.
 
 ## Outputs
 
@@ -55,7 +62,7 @@ Univariate results:
 outputs/univariate/run_<timestamp>/
 ```
 
-Multivariate summaries:
+Multivariate results:
 
 ```text
 outputs/multivariate/
